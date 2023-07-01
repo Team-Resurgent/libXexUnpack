@@ -31,11 +31,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Build ${{ matrix.build_target }} Native Library
-        run:  |
-              if [ "$RUNNER_OS" == "Windows" ]; then
-                ./build.cmd ${{ matrix.build_args }}
-              else
-                ./build.sh ${{ matrix.build_args }}
-              fi
-        shell: bash
+      - name: Build
+        run: cmake --build ${{github.workspace}}/build --config ${{ matrix.build_args }}
+        
+      - name: Upload ${{ matrix.build_target }} Native Library
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.build_target }}
+          path: ${{ matrix.artifact_name }}
+          if-no-files-found: error
+        
