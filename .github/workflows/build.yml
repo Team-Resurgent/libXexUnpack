@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Configure
-        run: cmake -B ${{ matrix.artifact_name }} -DCMAKE_BUILD_TYPE Release
+        run: cmake -B ${{ matrix.artifact_name }} -DCMAKE_BUILD_TYPE=Release
         
       - name: Build
         run: cmake --build . --target {{ matrix.build_target }}
