@@ -12,23 +12,23 @@ jobs:
         include:
           - os: windows-latest
             build_target: win-x64
-            artifact_name: build\Release\win-x64\libXexUnpack.dll
-          - os: windows-latest
-            build_target: win-x86
-            artifact_name: build\Release\win-x86\libXexUnpack.dll
+            artifact_name: build\Release\libXexUnpack.dll
           - os: ubuntu-latest
             build_target: linux-x64
-            artifact_name: build/Release/linux-x64/libXexUnpack.so
+            artifact_name: build/Release/libXexUnpack.so
           - os: macos-latest
             build_target: osx
-            artifact_name: build/Release/osx/libXexUnpack.dylib
+            artifact_name: build/libXexUnpack.dylib
     name: ${{ matrix.build_target }} Native Build
 
     steps:
       - uses: actions/checkout@v3
 
       - name: Configure
-        run: cmake -B ${{ matrix.artifact_name }} -DCMAKE_BUILD_TYPE=Release
+        run: cmake -B build
+    
+      - name: Build
+        run: cmake --build build --config Release
         
       - name: Create Release
         uses: softprops/action-gh-release@v1
