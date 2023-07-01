@@ -1,0 +1,42 @@
+name: CI
+on:
+  create: # when tags are created
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+jobs:
+  native_builds:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            build_args: release win-x64
+            build_target: win-x64
+            artifact_name: build\Release\win-x64\libXexUnpack.dll
+          - os: windows-latest
+            build_args: Release win-x86
+            build_target: win-x86
+            artifact_name: build\Release\win-x86\libXexUnpack.dll
+          - os: ubuntu-latest
+            build_args: release linux-x64
+            build_target: linux-x64
+            artifact_name: build/Release/linux-x64/libveldrid-spirv.so
+          - os: macos-latest
+            build_args: release osx 'arm64;x86_64'
+            build_target: osx
+            artifact_name: build/Release/osx/libXexUnpack.dylib
+    name: ${{ matrix.build_target }} Native Build
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build ${{ matrix.build_target }} Native Library
+        run:  |
+              if [ "$RUNNER_OS" == "Windows" ]; then
+                ./build.cmd ${{ matrix.build_args }}
+              else
+                ./build.sh ${{ matrix.build_args }}
+              fi
+        shell: bash
