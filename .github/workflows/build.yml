@@ -13,11 +13,11 @@ jobs:
           - os: windows-latest
             build_target: win-x64
             build_path: \build\
-            artifact_path: \build\Release\XexUnpack.dll
+            artifact_path: \build\Release\libXexUnpack.dll
           - os: ubuntu-latest
             build_target: linux-x64
             build_path: /build/
-            artifact_path: /build/libXexUnpack.so softprops/action-gh-release@v0.1.15
+            artifact_path: /build/libXexUnpack.so
           - os: macos-latest
             build_target: osx
             build_path: /build/
