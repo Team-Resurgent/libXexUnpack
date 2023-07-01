@@ -34,7 +34,7 @@ jobs:
         run: cmake -B '${{github.workspace}}${{ matrix.build_path }}'
     
       - name: Build
-        run: cmake --build '${{github.workspace}}${{ matrix.artifact_path }}' --config Release
+        run: cmake --build '${{github.workspace}}${{ matrix.build_path }}' --config Release
         
       - name: List Working Directory Contents
         uses: cinderblock/github-action-debug-list-files@v1
