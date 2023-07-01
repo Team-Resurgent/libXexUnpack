@@ -18,7 +18,7 @@ jobs:
             artifact_name: build\Release\win-x86\libXexUnpack.dll
           - os: ubuntu-latest
             build_target: linux-x64
-            artifact_name: build/Release/linux-x64/libveldrid-spirv.so
+            artifact_name: build/Release/linux-x64/libXexUnpack.so
           - os: macos-latest
             build_target: osx
             artifact_name: build/Release/osx/libXexUnpack.dylib
@@ -29,9 +29,6 @@ jobs:
 
       - name: Configure
         run: cmake -B ${{ matrix.artifact_name }} -DCMAKE_BUILD_TYPE=Release
-        
-      - name: Build
-        run: cmake --build . --target {{ matrix.build_target }}
         
       - name: Upload ${{ matrix.build_target }} Native Library
         uses: actions/upload-artifact@v2
