@@ -1,6 +1,6 @@
 #include <cstdarg>
 
-#include "library.h"
+#include "libXexUnpack.h"
 #include <iostream>
 #include "mspack/lzx.h"
 #include "mspack/mspack.h"
