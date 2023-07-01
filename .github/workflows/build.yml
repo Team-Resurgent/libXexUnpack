@@ -17,7 +17,7 @@ jobs:
           - os: ubuntu-latest
             build_target: linux-x64
             build_path: /build/
-            artifact_path: /build/libXexUnpack.so
+            artifact_path: /build/libXexUnpack.so softprops/action-gh-release@v0.1.15
           - os: macos-latest
             build_target: osx
             build_path: /build/
@@ -37,7 +37,7 @@ jobs:
         uses: cinderblock/github-action-debug-list-files@v1
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v0.1.15
         with:
           tag_name: latest
           draft: false
