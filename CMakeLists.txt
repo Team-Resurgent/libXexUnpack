@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.25)
 project(XexUnpack)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${BIN_PATH}/build/" )
 
 include_directories(mspack)
 
