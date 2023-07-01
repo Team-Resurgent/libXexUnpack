@@ -27,8 +27,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
--B ${{github.workspace}}/build
-
       - name: Configure
         run: cmake -B ${{ matrix.artifact_name }} --config Release
         
