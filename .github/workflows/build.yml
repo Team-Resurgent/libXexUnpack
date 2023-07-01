@@ -12,13 +12,16 @@ jobs:
         include:
           - os: windows-latest
             build_target: win-x64
-            artifact_name: build\Release\libXexUnpack.dll
+            artifact_path: \build\Release\
+            artifact_name: libXexUnpack.dll
           - os: ubuntu-latest
             build_target: linux-x64
-            artifact_name: build/Release/libXexUnpack.so
+            artifact_path: /build/Release/
+            artifact_name: libXexUnpack.so
           - os: macos-latest
             build_target: osx
-            artifact_name: build/libXexUnpack.dylib
+            artifact_path: /build/Release/
+            artifact_name: libXexUnpack.dylib
     name: ${{ matrix.build_target }} Native Build
 
     steps:
@@ -28,19 +31,13 @@ jobs:
         run: cmake -B build
     
       - name: Build
-        run: cmake --build build --config Release
+        run: cmake --build '${{github.workspace}}${{ matrix.artifact_path }}' --config Release
         
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: latest
           draft: false
-          files: ${{ matrix.artifact_name }}
+          files: '${{github.workspace}}${{ matrix.artifact_path }}${{ matrix.artifact_name }}'
         
-      - name: Upload ${{ matrix.build_target }} Native Library
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ matrix.build_target }}
-          path: ${{ matrix.artifact_name }}
-          if-no-files-found: error
-        
+
