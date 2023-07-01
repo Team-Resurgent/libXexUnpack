@@ -31,7 +31,7 @@ jobs:
         run: cmake -B build
     
       - name: Build
-        run: cmake --build . --config Release
+        run: cmake --build buld --config Release
         
       - name: List Working Directory Contents
         uses: cinderblock/github-action-debug-list-files@v1
