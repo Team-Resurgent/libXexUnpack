@@ -1,4 +1,5 @@
 #include <cstdarg>
+#include <cstring>
 
 #include "libXexUnpack.h"
 #include <iostream>
