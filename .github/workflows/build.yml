@@ -11,19 +11,15 @@ jobs:
       matrix:
         include:
           - os: windows-latest
-            build_args: release win-x64
             build_target: win-x64
             artifact_name: build\Release\win-x64\libXexUnpack.dll
           - os: windows-latest
-            build_args: Release win-x86
             build_target: win-x86
             artifact_name: build\Release\win-x86\libXexUnpack.dll
           - os: ubuntu-latest
-            build_args: release linux-x64
             build_target: linux-x64
             artifact_name: build/Release/linux-x64/libveldrid-spirv.so
           - os: macos-latest
-            build_args: release osx 'arm64;x86_64'
             build_target: osx
             artifact_name: build/Release/osx/libXexUnpack.dylib
     name: ${{ matrix.build_target }} Native Build
@@ -31,8 +27,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+-B ${{github.workspace}}/build
+
+      - name: Configure
+        run: cmake -B ${{ matrix.artifact_name }} --config Release
+        
       - name: Build
-        run: cmake --build ${{github.workspace}}/build --config ${{ matrix.build_args }}
+        run: cmake --build . --target {{ matrix.build_target }}
         
       - name: Upload ${{ matrix.build_target }} Native Library
         uses: actions/upload-artifact@v2
