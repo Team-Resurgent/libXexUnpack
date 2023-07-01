@@ -37,7 +37,7 @@ jobs:
         uses: cinderblock/github-action-debug-list-files@v1
 
       - name: Create Release
-        uses: softprops/action-gh-release@v0.1.15
+        uses: softprops/action-gh-release@v0.1.13
         with:
           tag_name: latest
           draft: false
