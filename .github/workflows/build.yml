@@ -30,6 +30,13 @@ jobs:
       - name: Configure
         run: cmake -B ${{ matrix.artifact_name }} -DCMAKE_BUILD_TYPE=Release
         
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: latest
+          draft: false
+          files: ${{ matrix.artifact_name }}
+        
       - name: Upload ${{ matrix.build_target }} Native Library
         uses: actions/upload-artifact@v2
         with:
