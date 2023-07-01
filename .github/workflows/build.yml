@@ -18,12 +18,12 @@ jobs:
           - os: ubuntu-latest
             build_target: linux-x64
             build_path: /build/
-            artifact_path: /build/Release/
+            artifact_path: /build/
             artifact_name: libXexUnpack.so
           - os: macos-latest
             build_target: osx
             build_path: /build/
-            artifact_path: /build/Release/
+            artifact_path: /build/
             artifact_name: libXexUnpack.dylib
     name: ${{ matrix.build_target }} Native Build
 
