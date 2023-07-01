@@ -13,7 +13,7 @@ jobs:
           - os: windows-latest
             build_target: win-x64
             artifact_path: \build\Release\
-            artifact_name: libXexUnpack.dll
+            artifact_name: XexUnpack.dll
           - os: ubuntu-latest
             build_target: linux-x64
             artifact_path: /build/Release/
