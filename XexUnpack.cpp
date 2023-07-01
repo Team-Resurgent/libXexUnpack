@@ -1,7 +1,7 @@
 #include <cstdarg>
 #include <cstring>
 
-#include "libXexUnpack.h"
+#include "XexUnpack.h"
 #include <iostream>
 #include "mspack/lzx.h"
 #include "mspack/mspack.h"
