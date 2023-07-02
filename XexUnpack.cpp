@@ -168,8 +168,8 @@ uint32_t getBe32(void* inval) {
     return result;
 }
 
-int unpack(uint8_t* pInData, uint32_t inLen, uint8_t* pOutData, uint32_t outLen, uint32_t windowSize) {
-    int result = 1;
+bool unpack(uint8_t* pInData, uint32_t inLen, uint8_t* pOutData, uint32_t outLen, uint32_t windowSize) {
+    int result = false;
     struct mspack_system *sys = &mem_system;
     struct lzxd_stream *context = nullptr;
 
@@ -188,11 +188,9 @@ int unpack(uint8_t* pInData, uint32_t inLen, uint8_t* pOutData, uint32_t outLen,
     if (context != nullptr) {
         int stLzx = lzxd_decompress(context, (off_t) outLen);
         if (stLzx == MSPACK_ERR_OK) {
-            result = 1;
+            result = true;
         }
         lzxd_free(context);
-    } else {
-        result = 0;
     }
     sys->close((struct mspack_file *) in);
     sys->close((struct mspack_file *) out);
@@ -231,8 +229,8 @@ uint8_t* optimizePackData(uint8_t* pInData, uint32_t* finSiz, uint32_t inLen, ui
     return nullptr;
 }
 
-TR_EXPORT int UnpackXexData(uint8_t* inputData, uint32_t inputSize, uint8_t* outputData, uint32_t outputDataSize, uint32_t windowSize, uint32_t firstDataSize) {
-    int result = 0;
+TR_EXPORT void UnpackXexData(uint8_t* inputData, uint32_t inputSize, uint8_t* outputData, uint32_t outputDataSize, uint32_t windowSize, uint32_t firstDataSize, uint32_t &error) {
+    bool result = false;
     uint8_t *packedData;
     uint32_t packedDataSize;
     packedData = optimizePackData(inputData, (uint32_t *) &packedDataSize, inputSize, firstDataSize);
@@ -240,5 +238,5 @@ TR_EXPORT int UnpackXexData(uint8_t* inputData, uint32_t inputSize, uint8_t* out
         result = unpack(packedData, packedDataSize, outputData, outputDataSize, windowSize);
         free(packedData);
     }
-    return result;
+    error = result ? 0 : -1;
 }
