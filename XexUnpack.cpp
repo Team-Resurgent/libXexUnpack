@@ -197,24 +197,29 @@ bool unpack(uint8_t* pInData, uint32_t inLen, uint8_t* pOutData, uint32_t outLen
     return result;
 }
 
-uint8_t* optimizePackData(uint8_t* pInData, uint32_t* finSiz, uint32_t inLen, uint32_t firstSize) {
-    uint8_t *buffer = (uint8_t *) malloc(inLen);
-    *finSiz = 0;
+uint8_t* optimizePackData(uint8_t* inputData, uint32_t inputSize, uint32_t firstDataSize, uint32_t* packedDataSize) {
+    uint8_t *buffer = (uint8_t *) malloc(inputSize);
+    *packedDataSize = 0;
     if (buffer != nullptr) {
-        uint32_t currLen = firstSize;
+        uint32_t currLen = firstDataSize;
         uint32_t nextLen = 1;
         uint32_t compressedSz = 0;
         uint32_t currPos = 0;
         uint32_t lastPos = 0;
-        while ((currPos < inLen) && (nextLen != 0)) {
+        while ((currPos < inputSize) && (nextLen != 0)) {
             uint32_t innerLen = 1;
-            nextLen = getBe32(&pInData[currPos]);
+            nextLen = getBe32(&inputData[currPos]);
             currPos += 0x18;
             do {
-                innerLen = getBe16(&pInData[currPos]);
+                innerLen = getBe16(&inputData[currPos]);
                 if (innerLen) {
                     currPos += 2;
-                    memcpy(&buffer[compressedSz], &pInData[currPos], innerLen);
+                    if (compressedSz + innerLen >= inputSize || currPos + innerLen >= inputSize)
+                    {
+                        free(buffer);
+                        return nullptr;
+                    }
+                    memcpy(&buffer[compressedSz], &inputData[currPos], innerLen);
                     currPos += innerLen;
                     compressedSz += innerLen;
                 }
@@ -223,9 +228,10 @@ uint8_t* optimizePackData(uint8_t* pInData, uint32_t* finSiz, uint32_t inLen, ui
             currLen = nextLen;
             lastPos = currPos;
         }
-        *finSiz = compressedSz;
+        *packedDataSize = compressedSz;
         return buffer;
     }
+    free(buffer);
     return nullptr;
 }
 
@@ -233,7 +239,7 @@ TR_EXPORT void UnpackXexData(uint8_t* inputData, uint32_t inputSize, uint8_t* ou
     bool result = false;
     uint8_t *packedData;
     uint32_t packedDataSize;
-    packedData = optimizePackData(inputData, (uint32_t *) &packedDataSize, inputSize, firstDataSize);
+    packedData = optimizePackData(inputData, inputSize, firstDataSize, (uint32_t *) &packedDataSize);
     if (packedData != nullptr) {
         result = unpack(packedData, packedDataSize, outputData, outputDataSize, windowSize);
         free(packedData);
