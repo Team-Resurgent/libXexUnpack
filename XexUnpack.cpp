@@ -184,7 +184,7 @@ bool unpack(uint8_t* inputData, uint32_t inputDataSize, uint8_t* outputData, uin
     in = (mem_file *) sys->open(sys, (const char *) &source, MSPACK_SYS_OPEN_READ);
     out = (mem_file *) sys->open(sys, (const char *) &output, MSPACK_SYS_OPEN_WRITE);
 
-    context = lzxd_init(sys, (struct mspack_file *) in, (struct mspack_file *) out, getBitSize(windowSize), 0, windowSize, (off_t) outLen, 0);
+    context = lzxd_init(sys, (struct mspack_file *) in, (struct mspack_file *) out, getBitSize(windowSize), 0, windowSize, (off_t) outputDataSize, 0);
     if (context != nullptr) 
     {
         int stLzx = lzxd_decompress(context, (off_t) outputDataSize);
