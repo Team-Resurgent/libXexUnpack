@@ -199,58 +199,6 @@ bool unpack(uint8_t* inputData, uint32_t inputDataSize, uint8_t* outputData, uin
     return result;
 }
 
-uint8_t* optimizePackData(uint8_t* inputData, uint32_t inputSize, uint32_t firstDataSize, uint32_t* packedDataSize) {
-    uint8_t *buffer = (uint8_t *) malloc(inputSize);
-    *packedDataSize = 0;
-    if (buffer != nullptr) 
-    {
-        uint32_t currLen = firstDataSize;
-        uint32_t nextLen = 1;
-        uint32_t compressedSz = 0;
-        uint32_t currPos = 0;
-        uint32_t lastPos = 0;
-        while ((currPos < inputSize) && (nextLen != 0)) 
-        {
-            uint32_t innerLen = 1;
-            nextLen = getBe32(&inputData[currPos]);
-            currPos += 0x18;
-            do {
-                innerLen = getBe16(&inputData[currPos]);
-                if (innerLen) {
-                    currPos += 2;
-                    if (compressedSz + innerLen >= inputSize || currPos + innerLen >= inputSize)
-                    {
-                        free(buffer);
-                        return nullptr;
-                    }
-                    memcpy(&buffer[compressedSz], &inputData[currPos], innerLen);
-                    currPos += innerLen;
-                    compressedSz += innerLen;
-                }
-            } while (innerLen);
-            currPos = lastPos + currLen;
-            currLen = nextLen;
-            lastPos = currPos;
-        }
-        *packedDataSize = compressedSz;
-        return buffer;
-    }
-    free(buffer);
-    return nullptr;
-}
-
-TR_EXPORT void UnpackXexData(uint8_t* inputData, uint32_t inputDataSize, uint8_t* outputData, uint32_t outputDataSize, uint32_t windowSize, uint32_t firstDataSize, uint32_t &error) {
-    bool result = false;
-    uint8_t *packedData;
-    uint32_t packedDataSize;
-    packedData = optimizePackData(inputData, inputDataSize, firstDataSize, (uint32_t *) &packedDataSize);
-    if (packedData != nullptr) {
-        result = unpack(packedData, packedDataSize, outputData, outputDataSize, windowSize);
-        free(packedData);
-    }
-    error = result ? 0 : -1;
-}
-
 TR_EXPORT void LZXUnpack(uint8_t* inputData, uint32_t inputDataSize, uint8_t* outputData, uint32_t outputDataSize, uint32_t windowSize, uint32_t &error) {
     bool result = unpack(inputData, inputDataSize, outputData, outputDataSize, windowSize);
     error = result ? 0 : -1;
