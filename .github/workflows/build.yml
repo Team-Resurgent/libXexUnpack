@@ -8,39 +8,77 @@ jobs:
   native_builds:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: windows-latest
-            build_target: win-x64
-            build_path: \build\
-            artifact_path: \build\Release\libXexUnpack.dll
-          - os: ubuntu-latest
-            build_target: linux-x64
-            build_path: /build/
-            artifact_path: /build/libXexUnpack.so
+            rid: win-x64
+            cmake_args: -A x64
+            artifact_path: build/Release/libXexUnpack.dll
+          - os: windows-latest
+            rid: win-arm64
+            cmake_args: -A ARM64
+            artifact_path: build/Release/libXexUnpack.dll
+          - os: ubuntu-22.04
+            rid: linux-x64
+            cmake_args: -DCMAKE_BUILD_TYPE=Release
+            artifact_path: build/libXexUnpack.so
+          - os: ubuntu-22.04-arm
+            rid: linux-arm64
+            cmake_args: -DCMAKE_BUILD_TYPE=Release
+            artifact_path: build/libXexUnpack.so
           - os: macos-latest
-            build_target: osx
-            build_path: /build/
-            artifact_path: /build/libXexUnpack.dylib
-    name: ${{ matrix.build_target }} Native Build
+            rid: osx-x64
+            cmake_args: -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15
+            artifact_path: build/libXexUnpack.dylib
+          - os: macos-latest
+            rid: osx-arm64
+            cmake_args: -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
+            artifact_path: build/libXexUnpack.dylib
+    name: ${{ matrix.rid }} Native Build
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Configure
-        run: cmake -B '${{github.workspace}}${{ matrix.build_path }}'
-    
+        run: cmake -B build ${{ matrix.cmake_args }}
+
       - name: Build
-        run: cmake --build '${{github.workspace}}${{ matrix.build_path }}' --config Release
-        
-      - name: List Working Directory Contents
-        uses: cinderblock/github-action-debug-list-files@v1
+        run: cmake --build build --config Release
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.rid }}
+          path: ${{ matrix.artifact_path }}
+          if-no-files-found: error
+
+  release:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: native_builds
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+
+      - name: Package
+        working-directory: dist
+        run: |
+          for rid in */; do
+            rid=${rid%/}
+            zip -r "../libXexUnpack-$rid.zip" "$rid"
+          done
+          zip -r ../libXexUnpack-all.zip .
 
       - name: Create Release
-        uses: softprops/action-gh-release@v0.1.13
-        with:
-          tag_name: latest
-          draft: false
-          files: '${{github.workspace}}${{ matrix.artifact_path }}'
-        
-
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh release delete latest --cleanup-tag --yes || true
+          gh release create latest libXexUnpack-*.zip --title Latest --target "$GITHUB_SHA" \
+            --notes "Native builds of libXexUnpack. Each zip holds a folder named for its .NET runtime identifier; libXexUnpack-all.zip holds every folder."

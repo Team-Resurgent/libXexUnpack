@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 if(WIN32)
     set(CMAKE_SHARED_LIBRARY_PREFIX "lib")
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
 
 include_directories(mspack)
